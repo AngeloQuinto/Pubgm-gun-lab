@@ -56,6 +56,7 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
   // Register Fields
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
@@ -65,6 +66,7 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
   // Password visibility toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
 
   // Forgot password mode
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -228,6 +230,13 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
       passwordError = 'Password cannot contain spaces.';
     }
 
+    let confirmPasswordError: string | null = null;
+    if (!regConfirmPassword) {
+      confirmPasswordError = 'Please confirm your password.';
+    } else if (regConfirmPassword !== regPassword) {
+      confirmPasswordError = 'Passwords do not match.';
+    }
+
     let firstNameError: string | null = null;
     if (!trimmedFirst) {
       firstNameError = 'First Name is required.';
@@ -274,6 +283,7 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
     return {
       emailError,
       passwordError,
+      confirmPasswordError,
       firstNameError,
       lastNameError,
       ageError,
@@ -353,6 +363,7 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
     const firstErr =
       registerErrors.emailError ||
       registerErrors.passwordError ||
+      registerErrors.confirmPasswordError ||
       registerErrors.firstNameError ||
       registerErrors.lastNameError ||
       registerErrors.ageError ||
@@ -381,6 +392,9 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
       const registeredEmail = regEmail.trim();
       setRegEmail('');
       setRegPassword('');
+      setRegConfirmPassword('');
+      setShowRegPassword(false);
+      setShowRegConfirmPassword(false);
       setFirstName('');
       setLastName('');
       setAge('');
@@ -671,6 +685,47 @@ export const SignInScreen: React.FC<Props> = ({ onSignInSuccess }) => {
                     {showFieldError('regPassword', regPassword, registerErrors.passwordError, registerSubmitted)}
                   </Text>
                 )}
+              </View>
+
+              {/* Confirm Password */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>CONFIRM PASSWORD</Text>
+                <View style={styles.inputWrapper}>
+                  <Lock size={16} color="#64748B" style={styles.inputIcon} />
+                  <TextInput
+                    style={[
+                      styles.input,
+                      styles.inputWithIcon,
+                      styles.inputWithEye,
+                      showFieldError('regConfirmPassword', regConfirmPassword, registerErrors.confirmPasswordError, registerSubmitted) && styles.inputError,
+                      !registerErrors.passwordError && !registerErrors.confirmPasswordError && regConfirmPassword.length > 0 && styles.inputSuccess,
+                    ]}
+                    placeholder="••••••••"
+                    placeholderTextColor="#64748B"
+                    secureTextEntry={!showRegConfirmPassword}
+                    value={regConfirmPassword}
+                    onChangeText={setRegConfirmPassword}
+                    onBlur={() => markTouched('regConfirmPassword')}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setShowRegConfirmPassword((prev) => !prev)}
+                    activeOpacity={0.7}
+                  >
+                    {showRegConfirmPassword ? (
+                      <EyeOff size={18} color="#94A3B8" />
+                    ) : (
+                      <Eye size={18} color="#94A3B8" />
+                    )}
+                  </TouchableOpacity>
+                </View>
+                {showFieldError('regConfirmPassword', regConfirmPassword, registerErrors.confirmPasswordError, registerSubmitted) ? (
+                  <Text style={styles.errorText}>
+                    {showFieldError('regConfirmPassword', regConfirmPassword, registerErrors.confirmPasswordError, registerSubmitted)}
+                  </Text>
+                ) : !registerErrors.passwordError && !registerErrors.confirmPasswordError && regConfirmPassword.length > 0 ? (
+                  <Text style={styles.successText}>Passwords match.</Text>
+                ) : null}
               </View>
 
               {/* First Name & Last Name */}
